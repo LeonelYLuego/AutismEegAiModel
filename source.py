@@ -36,6 +36,7 @@ print(data.describe())
 ## Standardize
 scaler = StandardScaler()
 data_scaled = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
+new_data = data_scaled.to_csv("data_combined.csv", sep=',', index=False)
 
 data_scaled.plot()
 plt.show()
