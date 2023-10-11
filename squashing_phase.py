@@ -48,4 +48,4 @@ def get_channels(data):
 #definicion del factor de escala 
 data = pd.read_csv('./data_combined.csv')
 dataframe = pd.DataFrame(data, columns=data.columns)
-print(get_channels(dataframe))
+get_channels(dataframe)
