@@ -1,5 +1,4 @@
 import numpy as np 
-from scipy.stats import entropy
 import pandas as pd
 
 # Cada fila representa una muestra y cada columna un canal 
@@ -17,25 +16,36 @@ def calculate_entropy(data, time_scale):
     
     return entropy #se retorna un escalar
 
-#Calculamos entropias de diferentes escalas dividiendo los datos en segmentos y calculando la entropia de cada segmento 
-def calculate_multiscale_entropy(data, scale_factor): 
+def calculate_multiscale_entropy(channel, scale_factor, num_samples): 
+    entropies_multiscale = []
+    channel_info = {}
+
+    #Calculamos entropias de diferentes escalas dividiendo los datos en segmentos y calculando la entropia de cada segmento 
+    for i in range(0, num_samples, scale_factor):
+        segment = channel.iloc[i:i+scale_factor]
+        channel_entropy = calculate_entropy(segment, scale_factor)
+        entropies_multiscale.append(channel_entropy)
+
+    channel_info['name'] = channel.name #asignamos el noombre del canal 
+    channel_info['entropy'] = entropies_multiscale #agregamos su conjunto de entropias por segmento 
+
+    return channel_info
+
+
+def get_channels(data): 
+    scale_factor = 100
     num_samples, num_channels = data.shape
     entropies_multiscale = []
 
-    first_column = data.iloc[:, 0] # Primera columna
-    print(first_column)
-    #tenermos que mandar la primera columna
-    for i in range(0, num_samples, scale_factor):
-        segment = first_column.iloc[i:i+scale_factor]
-        channel_entropy = calculate_entropy(segment, scale_factor)
-        entropies_multiscale.append(channel_entropy)
-    print(entropies_multiscale)
-
-    return np.array(entropies_multiscale)
+    #recorremos los canales para calcular sus entropias 
+    for i in range(0, num_channels): 
+        column = data.iloc[:, i]
+        channel_entropy_object = calculate_multiscale_entropy(channel=column, scale_factor=scale_factor, num_samples=num_samples)
+        entropies_multiscale.append(channel_entropy_object)
+        
+    return entropies_multiscale
 
 #definicion del factor de escala 
 data = pd.read_csv('./data_combined.csv')
 dataframe = pd.DataFrame(data, columns=data.columns)
-scale_factor = 100
-entropies_multiscale = calculate_multiscale_entropy(dataframe, scale_factor)
-entropies_multiscale
+print(get_channels(dataframe))
