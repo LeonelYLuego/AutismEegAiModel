@@ -10,12 +10,12 @@ data_gama = pd.read_csv('./data/gama.csv')
 data_theta = pd.read_csv('./data/theta.csv')
 
 # Merge data
-data = pd.merge(data_alfa, data_beta, on=['Time:128Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], suffixes=('_alfa', '_beta'))
+data = pd.merge(data_alfa, data_beta, on=['Time:256Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], suffixes=('_alfa', '_beta'))
 data_frames = [data_delta, data_gama, data_theta]
 suffixes = ['_delta', '_gama', '_theta']
 for i in range(len(data_frames)):
-    data = pd.merge(data, data_frames[i], on=['Time:128Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], suffixes=('', suffixes[i]))
-data.drop(['Time:128Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], axis=1, inplace=True)
+    data = pd.merge(data, data_frames[i], on=['Time:256Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], suffixes=('', suffixes[i]))
+data.drop(['Time:256Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], axis=1, inplace=True)
 column_rename_dict = {
     f'Channel {i}': f'Channel {i}_delta' for i in range(1, 15)
 }
