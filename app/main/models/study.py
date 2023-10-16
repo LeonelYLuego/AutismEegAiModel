@@ -8,8 +8,15 @@ class Study(db.Model):
     __tablename__ = "study"
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     patientId = db.Column(UUID(as_uuid=True), db.ForeignKey('patient.id'), nullable=False)
-    created_on = db.Column(db.DateTime, nullable=False)
-    result = db.Column(VARCHAR(255), nullable=False)
+    createdOn = db.Column(db.DateTime, nullable=False)
+    executiveFunction = db.Column(db.Float, nullable=False)
+    sensoryProcessing = db.Column(db.Float, nullable=False)
+    repetitiveBehaviours = db.Column(db.Float, nullable=False)
+    motorSkills = db.Column(db.Float, nullable=False)
+    perseverativeThinking = db.Column(db.Float, nullable=False)
+    socialAwareness = db.Column(db.Float, nullable=False)
+    verbalNoVerbalCommunication = db.Column(db.Float, nullable=False)
+    informationProcessing = db.Column(db.Float, nullable=False)
 
     # Define the __init__ method
     def __init__(self, patient_id, datetime, result):
@@ -19,4 +26,4 @@ class Study(db.Model):
     
     # Define the __repr__ method
     def __repr__(self):
-        return f"<Study '{self.id}-{self.datetime}'>"
+        return f"<Study '{self.id}-{self.createdOn}'>"

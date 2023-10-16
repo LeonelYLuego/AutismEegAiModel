@@ -4,18 +4,17 @@ from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 
 def get_dataframe(data):
-    data = pd.DataFrame(data)
-    return data
+    return pd.DataFrame(data)
 
 def get_merged_dataframe(datas:list) -> pd.DataFrame:
     data = pd.DataFrame()
     types = ['alfa', 'beta', 'delta', 'gamma', 'theta']
     for i in range(len(datas)):
-        datas[i] = get_dataframe(datas[i])
+        dt = get_dataframe(datas[i])
         if i == 0:
-            data = datas[i]
+            data = dt
         else:
-            data = pd.merge(data, datas[i], on=['time'], suffixes=('', f'_{types[i]}'))
+            data = pd.merge(data, dt, on=['time'], suffixes=('', f'_{types[i]}'))
     data.drop(['time'], axis=1, inplace=True)
     column_rename_dict = {
         f'channel{i}': f'channel{i}_{types[0]}' for i in range(1, 15)

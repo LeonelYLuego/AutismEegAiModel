@@ -1,8 +1,11 @@
 from . import ai_blueprint
+from .. import db
 from ..models.wave import Wave
+from ..models.study import Study
+from ...scripts.source import get_preprocessed_data
 from flask import jsonify, request
 import uuid
-from ...scripts.source import get_preprocessed_data
+import random
 
 @ai_blueprint.route('/waves', methods=['POST'])
 def get_waves():
@@ -16,15 +19,28 @@ def get_waves():
     delta = [wave.to_json() for wave in Wave.query.filter_by(studyId=study_id, type='delta').all()]
     theta = [wave.to_json() for wave in Wave.query.filter_by(studyId=study_id, type='theta').all()]
 
-    preproccesed = get_preprocessed_data([alfa, beta, delta, gamma, theta])
+    # preproccesed = get_preprocessed_data([alfa, beta, delta, gamma, theta])
+
+    study = Study.query.filter_by(id=study_id).first()
+
+    keys = ['executiveFunction', 'sensoryProcessing', 'repetitiveBehaviours', 'motorSkills', 'perseverativeThinking', 'socialAwareness', 'verbalNoVerbalCommunication', 'informationProcessing']
+    for i in range(len(keys)):
+        # Get a random decimal between 0 and 100
+        random_decimal = random.uniform(0, 100)
+        # Set the value of the key to the random decimal
+        study.__setattr__(keys[i], random_decimal)
+    
+    # Save the changes of the study
+    db.session.commit()
+
 
     return jsonify({
-        'executive_function': 20,
-        'sensory_processing': 20,
-        'repetitive_behaviors': 20,
-        'motor_skills': 20,
-        'persevering thought': 20,
-        'social_conscience': 20,
-        'verbal_non-verbal_communication': 20,
-        'information_processing':20
-    })
+        'executive_function': study.executiveFunction,
+        'sensory_processing': study.sensoryProcessing,
+        'repetitive_behaviors': study.repetitiveBehaviours,
+        'motor_skills': study.motorSkills,
+        'perseverative_thinking': study.perseverativeThinking,
+        'social_awareness': study.socialAwareness,
+        'verbal_no_verbal_communication': study.verbalNoVerbalCommunication,
+        'information_processing': study.informationProcessing,
+    }), 200
