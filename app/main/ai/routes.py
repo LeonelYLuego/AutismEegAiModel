@@ -19,7 +19,7 @@ def get_waves():
     delta = [wave.to_json() for wave in Wave.query.filter_by(studyId=study_id, type='delta').all()]
     theta = [wave.to_json() for wave in Wave.query.filter_by(studyId=study_id, type='theta').all()]
 
-    # preproccesed = get_preprocessed_data([alfa, beta, delta, gamma, theta])
+    preproccesed = get_preprocessed_data(alfa, beta, delta, gamma, theta)
 
     study = Study.query.filter_by(id=study_id).first()
 
