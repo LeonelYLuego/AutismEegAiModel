@@ -3,6 +3,14 @@ from sklearn.preprocessing import StandardScaler
 
 scaler = StandardScaler()
 
+def calculate_time(time_column, scale_factor, num_samples): 
+    times = []
+    previous_i = 0
+
+    for i in range(0, num_samples, scale_factor):
+        times.append(time_column[i+scale_factor] - time_column[i])
+    return times
+
 def get_dataframe(data):
     return pd.DataFrame(data)
 
@@ -79,7 +87,7 @@ def get_channels(data):
     entropies_multiscale = {}
 
     #recorremos los canales para calcular sus entropias 
-    for i in range(0, num_channels):
+    for i in range(1, num_channels):
         column = data.iloc[:, i]
         entropies_multiscale[column.name] = calculate_multiscale_entropy(channel=column, scale_factor=scale_factor, num_samples=num_samples)
     

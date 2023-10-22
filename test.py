@@ -15,7 +15,7 @@ data_frames = [data_delta, data_gama, data_theta]
 suffixes = ['_delta', '_gama', '_theta']
 for i in range(len(data_frames)):
     data = pd.merge(data, data_frames[i], on=['Time:256Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], suffixes=('', suffixes[i]))
-data.drop(['Time:256Hz', 'Epoch', 'Event Id', 'Event Date', 'Event Duration'], axis=1, inplace=True)
+data.drop(['Epoch', 'Event Id', 'Event Date', 'Event Duration'], axis=1, inplace=True)
 column_rename_dict = {
     f'Channel {i}': f'Channel {i}_delta' for i in range(1, 15)
 }
@@ -37,7 +37,6 @@ print(data.describe())
 scaler = StandardScaler()
 data_scaled = pd.DataFrame(scaler.fit_transform(data), columns=data.columns)
 def calculate_entropy(data, time_scale): 
-    #falta mandar el rango de empiezar y terminar el ciclo 
     multiplier = 1/time_scale
     addition_of_x = 0
 
