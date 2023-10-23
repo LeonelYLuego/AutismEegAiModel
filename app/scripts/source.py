@@ -6,7 +6,7 @@ scaler = StandardScaler()
 def calculate_time(time_column, scale_factor, num_samples): 
     times = []
 
-    for i in range(0, num_samples, scale_factor):
+    for i in range(0, num_samples - scale_factor, scale_factor):
         times.append(time_column[i+scale_factor] - time_column[i])
     return times
 
