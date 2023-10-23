@@ -8,8 +8,6 @@ class Wave(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     studyId = db.Column(UUID(as_uuid=True), db.ForeignKey('study.id'), nullable=False)
     time = db.Column(db.Float, nullable=False)
-    # Define the type column as an enum
-    type = db.Column(db.Enum('alfa', 'beta', 'gamma', 'delta', 'theta', name='wave_type'), nullable=False)
     channel1 = db.Column(db.Float, nullable=False)
     channel2 = db.Column(db.Float, nullable=False)
     channel3 = db.Column(db.Float, nullable=False)
