@@ -1,6 +1,5 @@
 import pandas as pd
 import joblib
-from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 from tsfresh.feature_extraction.feature_calculators import (
     mean,
@@ -9,6 +8,7 @@ from tsfresh.feature_extraction.feature_calculators import (
     abs_energy,
     standard_deviation,
 )
+
 
 def extract_data(jsons):
     data = pd.DataFrame(jsons)
@@ -34,14 +34,16 @@ def extract_data(jsons):
     }
 
     summary_statistics = pd.DataFrame(summary_statistics)
-    return summary_statistics.mean(axis=0).values 
+    return summary_statistics.mean(axis=0).values
+
 
 def get_result(jsons):
-    standard_scaler = StandardScaler()
+    standard_scaler = joblib.load("app/static/scaler.joblib")
     data = [extract_data(jsons)]
-    data_pred = standard_scaler.fit_transform(data)
+    data_pred = standard_scaler.transform(data)
 
     # TODO: Averiguar como obtener el path de la carpeta app
     svm_regression = joblib.load("app/static/model.joblib")
     result = svm_regression.predict(data_pred)
+    print(result)
     return result[0]
