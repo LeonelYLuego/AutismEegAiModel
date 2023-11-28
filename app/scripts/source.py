@@ -1,79 +1,47 @@
 import pandas as pd
+import joblib
+from pathlib import Path
 from sklearn.preprocessing import StandardScaler
+from tsfresh.feature_extraction.feature_calculators import (
+    mean,
+    kurtosis,
+    skewness,
+    abs_energy,
+    standard_deviation,
+)
 
-scaler = StandardScaler()
+def extract_data(jsons):
+    data = pd.DataFrame(jsons)
 
-def calculate_time(time_column, scale_factor, num_samples): 
-    times = []
+    relevant_columns = [
+        "channel3",
+        "channel12",
+    ]
 
-    for i in range(0, num_samples - scale_factor, scale_factor):
-        times.append(time_column[i+scale_factor] - time_column[i])
-    return times
+    data = data[relevant_columns]
+    data = data.drop(range(1538))
+    data[relevant_columns] = data[relevant_columns].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    data = data.dropna()
 
-def get_dataframe(data):
-    dt = pd.DataFrame(data)
-    # Get the time column
-    time_column = dt['time']
-    dt.drop(['time'], axis=1, inplace=True)
-    return dt, time_column
+    summary_statistics = {
+        "Mean": data.apply(mean),
+        "Kurtosis": data.apply(kurtosis),
+        "Skewness": data.apply(skewness),
+        "Abs Energy": data.apply(abs_energy),
+        "Standard Deviation": data.apply(standard_deviation),
+    }
 
-def calculate_entropy(data, time_scale): 
-    #falta mandar el rango de empiezar y terminar el ciclo 
-    multiplier = 1/time_scale
-    addition_of_x = 0
+    summary_statistics = pd.DataFrame(summary_statistics)
+    return summary_statistics.mean(axis=0).values 
 
-    for x_data in data:
-        addition_of_x += x_data
+def get_result(jsons):
+    standard_scaler = StandardScaler()
+    data = [extract_data(jsons)]
+    data_pred = standard_scaler.fit_transform(data)
 
-    entropy = multiplier * addition_of_x
-    
-    return entropy #se retorna un escalar
-
-def calculate_multiscale_entropy(channel, scale_factor, num_samples): 
-    entropies_multiscale = []
-
-    #Calculamos entropias de diferentes escalas dividiendo los datos en segmentos y calculando la entropia de cada segmento 
-    for i in range(0, num_samples, scale_factor):
-        entropies_multiscale.append(calculate_entropy(channel.iloc[i:i+scale_factor], scale_factor))
-
-    return entropies_multiscale
-
-def get_channels(data, time_col):
-    """
-        get_channels separa por canales la data obtenida de data_scaled y calcula la entropia por segmentos de las series de tiempo de los canales. 
-
-        Input: Dataframe
-        Output: List of objects [{
-                'name': 'channel 1_alfa', 
-                'entropy': [list of float numbers]
-            }, 
-            {
-                'name': 'channel 2_alfa', 
-                'entropy': [list of float numbers]
-            }, 
-        ]
-    """
-    scale_factor = 256
-    num_samples, num_channels = data.shape
-    entropies_multiscale = {}
-    #recorremos los canales para calcular sus entropias 
-    for i in range(0, num_channels):
-        column = data.iloc[:, i]
-        entropies_multiscale[column.name] = calculate_multiscale_entropy(channel=column, scale_factor=scale_factor, num_samples=num_samples)
-    
-    entropies_multiscale['time'] = calculate_time(time_col, scale_factor, num_samples)
-
-    return entropies_multiscale
-
-def get_preprocessed_data(waves):
-    """get_preprocessed_data regresa un dataframe con los canales y sus entropias
-
-    Args:
-        datas (list): lista de listas de objetos de tipo Wave
-
-    Returns:
-        DataFrame: DataFrame con los canales y sus entropias
-    """
-    waves_df, time_col = get_dataframe(waves)
-    ret =  pd.DataFrame(get_channels(pd.DataFrame(scaler.fit_transform(waves_df), columns=waves_df.columns), time_col))
-    print('ups')
+    # TODO: Averiguar como obtener el path de la carpeta app
+    svm_regression = joblib.load("app/static/model.joblib")
+    result = svm_regression.predict(data_pred)
+    return result[0]

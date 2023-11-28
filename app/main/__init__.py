@@ -6,7 +6,7 @@ from .config import config_by_name
 db = SQLAlchemy()
 
 def create_app(config_name):
-    app = Flask('AutismAI')
+    app = Flask('AutismAI', static_folder='/static')
     app.config.from_object(config_by_name[config_name])
     CORS(app)
     db.init_app(app)
